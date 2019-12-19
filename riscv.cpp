@@ -317,12 +317,12 @@ void Riscv::cmptg(const Instruction& instr)
 
 void Riscv::logRegRead(uint8_t num, reg_t val)
 {
-    log << "RR " << regToStr(num) << " : " << immToStr(val) << endl;
+    log << "RegRead " << regToStr(num) << " : " << immToStr(val) << endl;
 }
 
 void Riscv::logRegWrite(uint8_t num, reg_t val)
 {
-    log << "RW " << regToStr(num) << " : " << immToStr(val) << endl;
+    log << "RegWrite " << regToStr(num) << " : " << immToStr(val) << endl;
 }
 
 void Riscv::logGetTag(address_t addr, tag_t tag)
@@ -337,7 +337,7 @@ void Riscv::logSetTag(address_t addr, tag_t tag)
 
 void Riscv::logMemRead(address_t addr, void* dst, size_t nbyte)
 {
-    log << "MR";
+    log << "MemRead ";
     switch (nbyte)
     {
         case sizeof(uint8_t):
@@ -357,7 +357,7 @@ void Riscv::logMemRead(address_t addr, void* dst, size_t nbyte)
 
 void Riscv::logMemWrite(address_t addr, void* src, size_t nbyte)
 {
-    log << "MW";
+    log << "MemWrite ";
     switch (nbyte)
     {
         case sizeof(uint8_t):
@@ -377,24 +377,24 @@ void Riscv::logMemWrite(address_t addr, void* src, size_t nbyte)
 
 void Riscv::logRegImm(string name, uint8_t r1, uint8_t r2, int32_t imm)
 {
-    log << addrToStr(hart.getPc()) << " " << name << " " << regToStr(r1) << ", "
-        << regToStr(r2) << ", " << immToStr(imm) << endl;
+    log << endl << addrToStr(hart.getPc()) << " " << name << " " << regToStr(r1)
+        << ", " << regToStr(r2) << ", " << immToStr(imm) << endl;
 }
 
 void Riscv::logIntRegReg(string name, uint8_t rd, uint8_t rs1, uint8_t rs2)
 {
-    log << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rd) << ", "
-        << regToStr(rs1) << ", " << regToStr(rs2) << endl;
+    log << endl << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rd)
+        << ", " << regToStr(rs1) << ", " << regToStr(rs2) << endl;
 }
 
 void Riscv::logJump(string name, uint8_t rd, uint32_t addr)
 {
-    log << addrToStr(hart.getPc()) << " " << name
+    log << endl << addrToStr(hart.getPc()) << " " << name
         << regToStr(rd) << ", " << addrToStr(addr) << endl;
 }
 
 void Riscv::logCondBr(string name, uint8_t rs1, uint8_t rs2, uint32_t addr)
 {
-    log << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rs1)
+    log << endl << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rs1)
         << ", " << regToStr(rs2) << ", " << addrToStr(addr) << endl;
 }
