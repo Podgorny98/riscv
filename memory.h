@@ -2,28 +2,32 @@
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 
-typedef uint32_t address_t;
+using address_t = uint32_t;
+using tag_t = uint8_t;
+
+enum { MEM_SIZE = 0x10000000 };
+enum { TAGS_NUM = MEM_SIZE / 16 };
+// Memory allocations must be aligned on 16 bytes
 
 class Memory
 {
 public:
-    Memory(uint32_t size);
-    ~Memory();
+    Memory() = default;
+    ~Memory() {}
     void read(address_t address, void* dst, size_t nbyte);
     void write(address_t address, void* src, size_t nbyte);
+    tag_t getTag(address_t address);
+    void setTag(address_t address, tag_t tag);
 
-    size_t getSize()
-    {
-        return size_;
-    }
     //int dump(void* start=)
 
-//private:
-    uint32_t size_;
-    uint8_t* memory_;
+private:
+    uint8_t memory_[MEM_SIZE];
+    std::array<tag_t, TAGS_NUM> tags;
 };
 
 #endif

@@ -16,9 +16,7 @@
 class Riscv
 {
 public:
-    Riscv(uint32_t memorySize);
-
-    size_t getMemorySize();
+    Riscv() = default;
 
     // instructions executors
     #include "rv32i.inc"
@@ -41,7 +39,7 @@ public:
 
     Hart hart;
     Memory memory;
-    ofstream log;
+    ofstream log = ofstream("log_file");
 };
 
 #endif
