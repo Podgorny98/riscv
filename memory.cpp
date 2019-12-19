@@ -19,3 +19,16 @@ void Memory::write(address_t address, void* src, std::size_t nbyte)
     std::memcpy(&memory_[real_addr], src, nbyte);
 }
 
+tag_t Memory::getTag(address_t address)
+{
+  uint32_t real_addr = address & (0xF << 28);
+  uint32_t tag_num = (real_addr % 16) ? (real_addr / 16) : (real_addr / 16 + 1);
+  return tags.at(tag_num);
+}
+
+void Memory::setTag(address_t address, tag_t tag)
+{
+  uint32_t real_addr = address & (0xF << 28);
+  uint32_t tag_num = (real_addr % 16) ? (real_addr / 16) : (real_addr / 16 + 1);
+  tags.at(tag_num) = tag;
+}
