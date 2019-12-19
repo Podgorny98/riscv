@@ -11,6 +11,8 @@ using tag_t = uint8_t;
 
 enum { MEM_SIZE = 0x10000000 };
 enum { TAGS_NUM = MEM_SIZE / 16 };
+enum { REAL_ADDR_LEN = 28 };
+
 // Memory allocations must be aligned on 16 bytes
 
 class Memory
