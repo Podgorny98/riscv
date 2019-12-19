@@ -9,13 +9,13 @@ RF[rd] = *(RF[rs1] + imm).tag
 
 --------------------------------
 
-stg rd, imm(rs1)
+stg rs2, imm(rs1)
 # - imm
 * - rs1
 $ - rd
 ############*****111$$$$$0100011
 
-*(RF[rs1] + imm).tag = RF[rd]
+*(RF[rs1] + imm).tag = RF[rs2]
 
 --------------------------------
 
@@ -35,7 +35,11 @@ sptg rd, imm(rs1)
 $ - rd
 ############*****110$$$$$0100011
 
-(RF[rs1] + imm).tag = RF[rd]
+RF[rd].tag = RF[rs1]
 
 
+--------------------------------
 
+ctg rs2, imm(rs1)
+
+exception if *(RF[rs1] + imm).tag != RF[rs2]
