@@ -258,27 +258,47 @@ void Riscv::sw(const Instruction& instr)
 
 void Riscv::gtg(const Instruction& instr)
 {
-
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    tag_t tag = getTag(addr);
+    setReg(instr.rd, tag);
+    hart.updatePc();
 }
 
 void Riscv::stg(const Instruction& instr)
 {
-
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    tag_t tag = getReg(instr.rs2);
+    setTag(addr, tag);
+    hart.updatePc();
 }
 
 void Riscv::gptg(const Instruction& instr)
 {
-
+    tag_t tag = ((getReg(instr.rs1) + instr.imm) >> REAL_ADDR_LEN) & 0xf;
+    setReg(instr.rd, tag);
+    hart.updatePc();
 }
 
 void Riscv::sptg(const Instruction& instr)
 {
-
+    tag_t tag = getReg(instr.rs1);
+    reg_t val = getReg(instr.rd);
+    reg_t new_val = (val & ~(0xf << REAL_ADDR_LEN)) | (tag << REAL_ADDR_LEN);
+    setReg(instr.rd, new_val);
+    hart.updatePc();
 }
 
 void Riscv::cmptg(const Instruction& instr)
 {
-
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    tag_t mem_tag = getTag(addr);
+    tag_t cmp_tag = getReg(instr.rs2);
+    if (mem_tag != cmp_tag)
+    {
+        cout << "\nSegmentation fault\n";
+        assert(0);
+    }
+    hart.updatePc();
 }
 
 /*  Log service  */
