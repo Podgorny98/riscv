@@ -45,6 +45,12 @@ DECL_INSTR(sb)
 DECL_INSTR(sh)
 DECL_INSTR(sw)
 
+//MTE
+DECL_INSTR(gtg)
+DECL_INSTR(stg)
+DECL_INSTR(gptg)
+DECL_INSTR(sptg)
+
 #undef DECL_INSTR
 
 #define DECL_INSTR(instr_name)                      \

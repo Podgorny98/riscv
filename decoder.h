@@ -97,12 +97,16 @@ public:
         {0b001, &Riscv::lh},
         {0b010, &Riscv::lw},
         {0b100, &Riscv::lbu},
-        {0b101, &Riscv::lhu}};
+        {0b101, &Riscv::lhu},
+        {0b111, &Riscv::gtg},
+        {0b110, &Riscv::gptg};
 
     instrMap Store = {
         {0b000, &Riscv::sb},
         {0b001, &Riscv::sh},
-        {0b010, &Riscv::sw}};
+        {0b010, &Riscv::sw},
+        {0b111, &Riscv::stg}
+        {0b110, &Ridcv::sptg}};
 
     instrMap Jal = {
         {0b0, &Riscv::jal}};

@@ -206,6 +206,25 @@ void Riscv::lw(const Instruction& instr)
     hart.updatePc();
 }
 
+void Riscv::sptg(const Instruction& instr)
+{
+
+}
+
+void Riscv::gptg(const Instruction& instr)
+{
+
+}
+
+void Riscv::gtg(const Instruction& instr)
+{
+    
+}
+
+void Riscv::stg(const Instruction& instr)
+{
+}
+
 void Riscv::lbu(const Instruction& instr)
 {
     //logRegImm("lbu", instr.rd, instr.rs1, instr.imm);
