@@ -33,6 +33,8 @@ public:
     void logRegWrite(uint8_t num, reg_t val);
     void logMemRead(address_t addr, void* dst, size_t nbyte);
     void logMemWrite(address_t addr, void* src, size_t nbyte);
+    void logGetTag(address_t addr, tag_t tag);
+    void logSetTag(address_t addr, tag_t tag);
 
     void logRegImm(string name, uint8_t rd, uint8_t rs1, int32_t imm);
     void logIntRegReg(string name, uint8_t rd, uint8_t rs1, uint8_t rs2);

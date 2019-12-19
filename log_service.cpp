@@ -18,3 +18,10 @@ string immToStr(uint32_t imm)
     ss << "0x" << hex << setfill('0') << setw(8) << imm;
     return ss.str();
 }
+
+string tagToStr(uint8_t tag)
+{
+    stringstream ss;
+    ss << "0x" << hex << setfill('0') << setw(2) << +tag;
+    return ss.str();
+}

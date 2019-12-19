@@ -33,12 +33,15 @@ void Riscv::memWrite(address_t addr, void* src, size_t nbyte)
 
 tag_t Riscv::getTag(address_t address)
 {
-    return memory.getTag(address);
+    tag_t tag = memory.getTag(address);
+    logGetTag(address, tag);
+    return tag;
 }
 
 void Riscv::setTag(address_t address, tag_t tag)
 {
     memory.setTag(address, tag);
+    logSetTag(address, tag);
 }
 
 #define INT_REG_IMM(name, op)                             \
@@ -320,6 +323,16 @@ void Riscv::logRegRead(uint8_t num, reg_t val)
 void Riscv::logRegWrite(uint8_t num, reg_t val)
 {
     log << "RW " << regToStr(num) << " : " << immToStr(val) << endl;
+}
+
+void Riscv::logGetTag(address_t addr, tag_t tag)
+{
+    log << "TagRead " << addrToStr(addr) << " : " << tagToStr(tag) << endl;
+}
+
+void Riscv::logSetTag(address_t addr, tag_t tag)
+{
+    log << "TagWrite " << addrToStr(addr) << " : " << tagToStr(tag) << endl;
 }
 
 void Riscv::logMemRead(address_t addr, void* dst, size_t nbyte)

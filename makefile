@@ -24,4 +24,4 @@ main: riscv.o memory.o decoder.o simulator.o main.o log_service.o hart.o
 	$(CC) $(CFLAGS) -o main $^ # -lelf
 
 clean:
-	rm -rf *.o *.exe
+	rm -rf *.o *.exe log_file
