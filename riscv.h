@@ -26,6 +26,8 @@ public:
     void setReg(uint8_t num, reg_t val);
     void memRead(address_t addr, void* dst, size_t nbyte);
     void memWrite(address_t addr, void* src, size_t nbyte);
+    tag_t getTag(address_t address);
+    void setTag(address_t address, tag_t tag);
 
     void logRegRead(uint8_t num, reg_t val);
     void logRegWrite(uint8_t num, reg_t val);

@@ -50,6 +50,7 @@ DECL_INSTR(gtg)
 DECL_INSTR(stg)
 DECL_INSTR(gptg)
 DECL_INSTR(sptg)
+DECL_INSTR(cmptg)
 
 #undef DECL_INSTR
 

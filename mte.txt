@@ -40,6 +40,6 @@ RF[rd].tag = RF[rs1]
 
 --------------------------------
 
-ctg rs2, imm(rs1)
+cmptg rs2, imm(rs1)
 
 exception if *(RF[rs1] + imm).tag != RF[rs2]

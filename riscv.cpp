@@ -31,6 +31,16 @@ void Riscv::memWrite(address_t addr, void* src, size_t nbyte)
     //logMemWrite(addr, src, nbyte);
 }
 
+tag_t Riscv::getTag(address_t address)
+{
+    return memory.getTag(address);
+}
+
+void Riscv::setTag(address_t address, tag_t tag)
+{
+    memory.setTag(address, tag);
+}
+
 #define INT_REG_IMM(name, op)                             \
 void Riscv::name(const Instruction& instr)                \
 {                                                         \
@@ -197,25 +207,6 @@ void Riscv::lw(const Instruction& instr)
     hart.updatePc();
 }
 
-void Riscv::sptg(const Instruction& instr)
-{
-
-}
-
-void Riscv::gptg(const Instruction& instr)
-{
-
-}
-
-void Riscv::gtg(const Instruction& instr)
-{
-    
-}
-
-void Riscv::stg(const Instruction& instr)
-{
-}
-
 void Riscv::lbu(const Instruction& instr)
 {
     //logRegImm("lbu", instr.rd, instr.rs1, instr.imm);
@@ -261,6 +252,33 @@ void Riscv::sw(const Instruction& instr)
     int32_t w = getReg(instr.rs2);
     memWrite(addr, &w, sizeof(w));
     hart.updatePc();
+}
+
+/*  MTE  */
+
+void Riscv::gtg(const Instruction& instr)
+{
+
+}
+
+void Riscv::stg(const Instruction& instr)
+{
+
+}
+
+void Riscv::gptg(const Instruction& instr)
+{
+
+}
+
+void Riscv::sptg(const Instruction& instr)
+{
+
+}
+
+void Riscv::cmptg(const Instruction& instr)
+{
+
 }
 
 /*  Log service  */
