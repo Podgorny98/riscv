@@ -118,6 +118,6 @@ void Simulator::run()
     auto t_end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> t_total = t_end - t_start;
 
-    std::cout << "Total instructions: " << num_executed << std::endl
-              << "Total time: " << t_total.count() << " ms" << std::endl;
+    cout << "Total instructions: " << num_executed << std::endl
+         << "Total time: " << t_total.count() << " ms" << std::endl;
 }
