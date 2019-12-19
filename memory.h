@@ -9,7 +9,8 @@
 using address_t = uint32_t;
 using tag_t = uint8_t;
 
-enum { MEM_SIZE = 0x10000000 };
+//enum { MEM_SIZE = 0x10000000 };
+enum { MEM_SIZE = 0x10000 };    // TODO: decide about memory size
 enum { TAGS_NUM = MEM_SIZE / 16 };
 enum { REAL_ADDR_LEN = 28 };
 
