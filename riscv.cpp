@@ -262,6 +262,7 @@ void Riscv::sw(const Instruction& instr)
 
 void Riscv::gtg(const Instruction& instr)
 {
+    logRegImm("gtg", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     tag_t tag = getTag(addr);
     setReg(instr.rd, tag);
@@ -270,6 +271,7 @@ void Riscv::gtg(const Instruction& instr)
 
 void Riscv::stg(const Instruction& instr)
 {
+    logRegImm("stg", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     tag_t tag = getReg(instr.rs2);
     setTag(addr, tag);
@@ -278,6 +280,7 @@ void Riscv::stg(const Instruction& instr)
 
 void Riscv::gptg(const Instruction& instr)
 {
+    logRegImm("gptg", instr.rd, instr.rs1, instr.imm);
     tag_t tag = ((getReg(instr.rs1) + instr.imm) >> REAL_ADDR_LEN) & 0xf;
     setReg(instr.rd, tag);
     hart.updatePc();
@@ -285,6 +288,7 @@ void Riscv::gptg(const Instruction& instr)
 
 void Riscv::sptg(const Instruction& instr)
 {
+    logRegImm("sptg", instr.rd, instr.rs1, 0);  // TODO: fix this
     tag_t tag = getReg(instr.rs1);
     reg_t val = getReg(instr.rd);
     reg_t new_val = (val & ~(0xf << REAL_ADDR_LEN)) | (tag << REAL_ADDR_LEN);
@@ -294,6 +298,7 @@ void Riscv::sptg(const Instruction& instr)
 
 void Riscv::cmptg(const Instruction& instr)
 {
+    logRegImm("cmptg", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     tag_t mem_tag = getTag(addr);
     tag_t cmp_tag = getReg(instr.rs2);
