@@ -5,30 +5,17 @@
 #include <cassert>
 #include <cstring>
 
-Memory::Memory(uint32_t size):
-    size_(size)
-{
-    memory_ = new uint8_t[size_];
-//    assert(memory_ != NULL);
-}
-
-Memory::~Memory()
-{
-    delete[] memory_;
-    memory_ = NULL;
-}
-
 void Memory::read(address_t address, void* dst, std::size_t nbyte)
 {
-    assert((address < size_ + nbyte) && "Memory read out of bounds");
-    std::memcpy(dst, &memory_[address], nbyte);
+    uint32_t real_addr = address & (0xF << 28);
+    assert((real_addr < MEM_SIZE + nbyte) && "Memory read out of bounds");
+    std::memcpy(dst, &memory_[real_addr], nbyte);
 }
 
 void Memory::write(address_t address, void* src, std::size_t nbyte)
 {
-    //std::cerr << std::hex << address << " " << size_  << " " << nbyte << "\n";
-    assert((address < size_ + nbyte) && "Memory write out of bounds");
-    std::memcpy(&memory_[address], src, nbyte);
+    uint32_t real_addr = address & (0xF << 28);
+    assert((real_addr < MEM_SIZE + nbyte) && "Memory write out of bounds");
+    std::memcpy(&memory_[real_addr], src, nbyte);
 }
-
 

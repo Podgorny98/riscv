@@ -9,8 +9,7 @@
 class Simulator
 {
 public:
-    Simulator(size_t memorySize):riscv(memorySize)
-    {}
+    Simulator() = default;
 
     void load(const char* name);
 

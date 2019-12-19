@@ -6,15 +6,6 @@
 
 #include "riscv.h"
 
-Riscv::Riscv(uint32_t memorySize):
-    memory(memorySize), log(string("log_file"))
-{}
-
-size_t Riscv::getMemorySize()
-{
-    return memory.getSize();
-}
-
 reg_t Riscv::getReg(uint8_t num)
 {
     reg_t val = hart.getReg(num);

@@ -7,23 +7,20 @@
 
 typedef uint32_t address_t;
 
+enum { MEM_SIZE = 0x10000000 };
+
 class Memory
 {
 public:
-    Memory(uint32_t size);
-    ~Memory();
+    Memory() = default;
+    ~Memory() {}
     void read(address_t address, void* dst, size_t nbyte);
     void write(address_t address, void* src, size_t nbyte);
 
-    size_t getSize()
-    {
-        return size_;
-    }
     //int dump(void* start=)
 
 //private:
-    uint32_t size_;
-    uint8_t* memory_;
+    uint8_t memory_[MEM_SIZE];
 };
 
 #endif

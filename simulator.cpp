@@ -107,7 +107,7 @@ void Simulator::run()
     {
         //std::cout << std::hex << riscv.hart.pc << "\n";
         //std::cerr << riscv.hart.pc << "\n\n";
-        if(riscv.hart.pc > riscv.memory.getSize())
+        if(riscv.hart.pc > MEM_SIZE)
             break;
         uint32_t encoding = fetch(riscv.hart.pc);
         Instruction instr = decode(encoding);
