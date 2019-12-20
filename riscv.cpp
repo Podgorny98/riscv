@@ -9,31 +9,45 @@
 reg_t Riscv::getReg(uint8_t num)
 {
     reg_t val = hart.getReg(num);
-    //logRegRead(num, val);
+    logRegRead(num, val);
     return val;
 }
 
 void Riscv::setReg(uint8_t num, reg_t val)
 {
     hart.setReg(num, val);
-    //logRegWrite(num, val);
+    logRegWrite(num, val);
 }
 
 void Riscv::memRead(address_t addr, void* dst, size_t nbyte)
 {
     memory.read(addr, dst, nbyte);
-    //logMemRead(addr, dst, nbyte);
+    logMemRead(addr, dst, nbyte);
 }
 
 void Riscv::memWrite(address_t addr, void* src, size_t nbyte)
 {
     memory.write(addr, src, nbyte);
-    //logMemWrite(addr, src, nbyte);
+    logMemWrite(addr, src, nbyte);
+}
+
+tag_t Riscv::getTag(address_t address)
+{
+    tag_t tag = memory.getTag(address);
+    logGetTag(address, tag);
+    return tag;
+}
+
+void Riscv::setTag(address_t address, tag_t tag)
+{
+    memory.setTag(address, tag);
+    logSetTag(address, tag);
 }
 
 #define INT_REG_IMM(name, op)                             \
 void Riscv::name(const Instruction& instr)                \
 {                                                         \
+    logRegImm(#name, instr.rd, instr.rs1, instr.imm);     \
     setReg(instr.rd, getReg(instr.rs1) op instr.imm);     \
     hart.updatePc();                                      \
 }
@@ -49,6 +63,7 @@ INT_REG_IMM(xori, ^)
 #define INT_REG_IMM(name, val)                            \
 void Riscv::name(const Instruction& instr)                \
 {                                                         \
+    logRegImm(#name, instr.rd, instr.rs1, instr.imm);     \
     setReg(instr.rd, (val));                              \
     hart.updatePc();                                      \
 }
@@ -65,8 +80,6 @@ INT_REG_IMM(srai, getReg(instr.rs1) >> instr.rs2)
 void Riscv::lui(const Instruction& instr)
 {
     reg_t val = (instr.imm << 12) & ~0xFFF;
-
-
     setReg(instr.rd, val);
     hart.updatePc();
 }
@@ -78,11 +91,12 @@ void Riscv::auipc(const Instruction& instr)
     hart.updatePc();
 }
 
-/*  Integer register-register instructions  */
+/******************  Integer register-register instructions  ******************/
 
 #define INT_REG_REG(name, op)                                  \
 void Riscv::name(const Instruction& instr)                     \
 {                                                              \
+    logIntRegReg(#name, instr.rd, instr.rs1, instr.rs2);       \
     setReg(instr.rd, getReg(instr.rs1) op getReg(instr.rs2));  \
     hart.updatePc();                                           \
 }
@@ -99,6 +113,7 @@ INT_REG_REG(xor_, ^)
 #define INT_REG_REG(name, val)                            \
 void Riscv::name(const Instruction& instr)                \
 {                                                         \
+    logIntRegReg(#name, instr.rd, instr.rs1, instr.rs2);  \
     setReg(instr.rd, (val));                              \
     hart.updatePc();                                      \
 }
@@ -111,12 +126,12 @@ INT_REG_REG(sra, getReg(instr.rs1) >> (getReg(instr.rs2) & 0x1F))
 
 #undef INT_REG_REG
 
-/*  Control transfer instructions  */
+/******************  Control transfer instructions  ******************/
 
 void Riscv::jal(const Instruction& instr)
 {
     uint32_t new_pc = hart.getPc() + (instr.imm << 1);
-    //logJump("jal", instr.rd, new_pc);
+    logJump("jal", instr.rd, new_pc);
     setReg(instr.rd, hart.getPc() + 4);
     hart.updatePc(new_pc);
 }
@@ -124,7 +139,7 @@ void Riscv::jal(const Instruction& instr)
 void Riscv::jalr(const Instruction& instr)
 {
     uint32_t new_pc = (getReg(instr.rs1) + instr.imm) & ~0x1u;
-    //logJump("jalr", instr.rd, new_pc);
+    logJump("jalr", instr.rd, new_pc);
     setReg(instr.rd, hart.getPc() + 4);
     hart.updatePc(new_pc);
 }
@@ -134,6 +149,7 @@ void Riscv::name(const Instruction& instr)              \
 {                                                       \
     uint32_t new_pc = hart.getPc() + (instr.imm << 1);  \
                                                         \
+    logCondBr(#name, instr.rs1, instr.rs2, new_pc);     \
                                                         \
     if (getReg(instr.rs1) condition getReg(instr.rs2))  \
         hart.updatePc(new_pc);                          \
@@ -153,6 +169,7 @@ void Riscv::name(const Instruction& instr)                                  \
 {                                                                           \
     uint32_t new_pc = hart.getPc() + (instr.imm << 1);                      \
                                                                             \
+    logCondBr(#name, instr.rs1, instr.rs2, new_pc);                         \
                                                                             \
     if ((uint32_t)getReg(instr.rs1) condition (uint32_t)getReg(instr.rs2))  \
         hart.updatePc(new_pc);                                              \
@@ -165,11 +182,11 @@ UNSIGN_COND_BRANCH(bgeu, >=)
 
 #undef UNSIGN_COND_BRANCH
 
-/*  Load and Store instructions  */
+/******************  Load and Store instructions  ******************/
 
 void Riscv::lb(const Instruction& instr)
 {
-    //logRegImm("lb", instr.rd, instr.rs1, instr.imm);
+    logRegImm("lb", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int8_t b = 0;
     memRead(addr, &b, sizeof(b));
@@ -179,7 +196,7 @@ void Riscv::lb(const Instruction& instr)
 
 void Riscv::lh(const Instruction& instr)
 {
-    //logRegImm("lh", instr.rd, instr.rs1, instr.imm);
+    logRegImm("lh", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int16_t h = 0;
     memRead(addr, &h, sizeof(h));
@@ -189,7 +206,7 @@ void Riscv::lh(const Instruction& instr)
 
 void Riscv::lw(const Instruction& instr)
 {
-    //logRegImm("lw", instr.rd, instr.rs1, instr.imm);
+    logRegImm("lw", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int32_t w = 0;
     memRead(addr, &w, sizeof(w));
@@ -197,28 +214,9 @@ void Riscv::lw(const Instruction& instr)
     hart.updatePc();
 }
 
-void Riscv::sptg(const Instruction& instr)
-{
-
-}
-
-void Riscv::gptg(const Instruction& instr)
-{
-
-}
-
-void Riscv::gtg(const Instruction& instr)
-{
-    
-}
-
-void Riscv::stg(const Instruction& instr)
-{
-}
-
 void Riscv::lbu(const Instruction& instr)
 {
-    //logRegImm("lbu", instr.rd, instr.rs1, instr.imm);
+    logRegImm("lbu", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     uint8_t ub = 0;
     memRead(addr, &ub, sizeof(ub));
@@ -228,7 +226,7 @@ void Riscv::lbu(const Instruction& instr)
 
 void Riscv::lhu(const Instruction& instr)
 {
-    //logRegImm("lhu", instr.rd, instr.rs1, instr.imm);
+    logRegImm("lhu", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     uint16_t uh = 0;
     memRead(addr, &uh, sizeof(uh));
@@ -238,7 +236,7 @@ void Riscv::lhu(const Instruction& instr)
 
 void Riscv::sb(const Instruction& instr)
 {
-    //logRegImm("sb", instr.rs2, instr.rs1, instr.imm);
+    logRegImm("sb", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int8_t b = getReg(instr.rs2) & 0xFF;
     memWrite(addr, &b, sizeof(b));
@@ -247,7 +245,7 @@ void Riscv::sb(const Instruction& instr)
 
 void Riscv::sh(const Instruction& instr)
 {
-    //logRegImm("sh", instr.rs2, instr.rs1, instr.imm);
+    logRegImm("sh", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int16_t h = getReg(instr.rs2) & 0xFFFF;
     memWrite(addr, &h, sizeof(h));
@@ -256,28 +254,90 @@ void Riscv::sh(const Instruction& instr)
 
 void Riscv::sw(const Instruction& instr)
 {
-    //logRegImm("sw", instr.rs2, instr.rs1, instr.imm);
+    logRegImm("sw", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int32_t w = getReg(instr.rs2);
     memWrite(addr, &w, sizeof(w));
     hart.updatePc();
 }
 
-/*  Log service  */
+/******************  MTE  ******************/
+
+void Riscv::gtg(const Instruction& instr)
+{
+    logRegImm("gtg", instr.rd, instr.rs1, instr.imm);
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    tag_t tag = getTag(addr);
+    setReg(instr.rd, tag);
+    hart.updatePc();
+}
+
+void Riscv::stg(const Instruction& instr)
+{
+    logRegImm("stg", instr.rs2, instr.rs1, instr.imm);
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    tag_t tag = getReg(instr.rs2);
+    setTag(addr, tag);
+    hart.updatePc();
+}
+
+void Riscv::gptg(const Instruction& instr)
+{
+    logRegImm("gptg", instr.rd, instr.rs1, instr.imm);
+    tag_t tag = ((getReg(instr.rs1) + instr.imm) >> REAL_ADDR_LEN) & 0xf;
+    setReg(instr.rd, tag);
+    hart.updatePc();
+}
+
+void Riscv::sptg(const Instruction& instr)
+{
+    logRegImm("sptg", instr.rd, instr.rs1, 0);  // TODO: fix this
+    tag_t tag = getReg(instr.rs1);
+    reg_t val = getReg(instr.rd);
+    reg_t new_val = (val & ~(0xf << REAL_ADDR_LEN)) | (tag << REAL_ADDR_LEN);
+    setReg(instr.rd, new_val);
+    hart.updatePc();
+}
+
+void Riscv::cmptg(const Instruction& instr)
+{
+    logRegImm("cmptg", instr.rs2, instr.rs1, instr.imm);
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    tag_t mem_tag = getTag(addr);
+    tag_t cmp_tag = getReg(instr.rs2);
+    if (mem_tag != cmp_tag)
+    {
+        cout << "\nSegmentation fault: tag missmatch\n";
+        exit(1);
+    }
+    hart.updatePc();
+}
+
+/******************  Log service  ******************/
 
 void Riscv::logRegRead(uint8_t num, reg_t val)
 {
-    log << "RR " << regToStr(num) << " : " << immToStr(val) << endl;
+    log << "RegRead " << regToStr(num) << " : " << immToStr(val) << endl;
 }
 
 void Riscv::logRegWrite(uint8_t num, reg_t val)
 {
-    log << "RW " << regToStr(num) << " : " << immToStr(val) << endl;
+    log << "RegWrite " << regToStr(num) << " : " << immToStr(val) << endl;
+}
+
+void Riscv::logGetTag(address_t addr, tag_t tag)
+{
+    log << "TagRead " << addrToStr(addr) << " : " << tagToStr(tag) << endl;
+}
+
+void Riscv::logSetTag(address_t addr, tag_t tag)
+{
+    log << "TagWrite " << addrToStr(addr) << " : " << tagToStr(tag) << endl;
 }
 
 void Riscv::logMemRead(address_t addr, void* dst, size_t nbyte)
 {
-    log << "MR";
+    log << "MemRead ";
     switch (nbyte)
     {
         case sizeof(uint8_t):
@@ -297,7 +357,7 @@ void Riscv::logMemRead(address_t addr, void* dst, size_t nbyte)
 
 void Riscv::logMemWrite(address_t addr, void* src, size_t nbyte)
 {
-    log << "MW";
+    log << "MemWrite ";
     switch (nbyte)
     {
         case sizeof(uint8_t):
@@ -317,24 +377,24 @@ void Riscv::logMemWrite(address_t addr, void* src, size_t nbyte)
 
 void Riscv::logRegImm(string name, uint8_t r1, uint8_t r2, int32_t imm)
 {
-    log << addrToStr(hart.getPc()) << " " << name << " " << regToStr(r1) << ", "
-        << regToStr(r2) << ", " << immToStr(imm) << endl;
+    log << endl << addrToStr(hart.getPc()) << " " << name << " " << regToStr(r1)
+        << ", " << regToStr(r2) << ", " << immToStr(imm) << endl;
 }
 
 void Riscv::logIntRegReg(string name, uint8_t rd, uint8_t rs1, uint8_t rs2)
 {
-    log << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rd) << ", "
-        << regToStr(rs1) << ", " << regToStr(rs2) << endl;
+    log << endl << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rd)
+        << ", " << regToStr(rs1) << ", " << regToStr(rs2) << endl;
 }
 
 void Riscv::logJump(string name, uint8_t rd, uint32_t addr)
 {
-    log << addrToStr(hart.getPc()) << " " << name
+    log << endl << addrToStr(hart.getPc()) << " " << name
         << regToStr(rd) << ", " << addrToStr(addr) << endl;
 }
 
 void Riscv::logCondBr(string name, uint8_t rs1, uint8_t rs2, uint32_t addr)
 {
-    log << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rs1)
+    log << endl << addrToStr(hart.getPc()) << " " << name << " " << regToStr(rs1)
         << ", " << regToStr(rs2) << ", " << addrToStr(addr) << endl;
 }
