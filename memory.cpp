@@ -5,6 +5,18 @@
 #include <cassert>
 #include <cstring>
 
+Memory::Memory()
+{
+    memory_ = new uint8_t[MEM_SIZE];
+    assert(memory_ != nullptr);
+}
+
+Memory::~Memory()
+{
+    delete[] memory_;
+    memory_ = nullptr;
+}
+
 void Memory::read(address_t address, void* dst, std::size_t nbyte)
 {
     uint32_t real_addr = address & ~(0xF << REAL_ADDR_LEN);

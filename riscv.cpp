@@ -308,7 +308,7 @@ void Riscv::cmptg(const Instruction& instr)
     if (mem_tag != cmp_tag)
     {
         cout << "\nSegmentation fault: tag missmatch\n";
-        assert(0);
+        exit(1);
     }
     hart.updatePc();
 }
