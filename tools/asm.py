@@ -38,6 +38,7 @@ abi = { 'zero': 0,
         't6': 31}
 
 def getInstr(instructions, mnem):
+    print(mnem)
     for instr in instructions:
         if instr['mnemonic'] == mnem:
             return instr
@@ -92,15 +93,17 @@ def genOpcode(data, components):
     #print(mnem)
     #print(args)
     instr = getInstr(data['instructions'], mnem)
-    #print(instr)
+    print(instr)
     opcode = instr['fixedvalue']
-    #print(opcode)
+    print()
 
 
     for i, dfield in enumerate(instr['fields']):
         field = data['fields'][dfield]
         opcode |= genField(field, args[i])
-    print(opcode)
+    
+    print('Opcode = {}'.format(bin(opcode)))
+    return opcode
 
 
 def main():
@@ -109,13 +112,21 @@ def main():
 
     fields = data["fields"]
     instructions = data["instructions"]
-    asm = open('main.s')
+    #asm = open('test.asm')
+    asm = open('../asm-files/example.asm')
 
     lines = asm.readlines()
 
+    out = open('out', 'w')
     for line in lines:
+        if not line.strip():
+            continue
+        if '#' in line or '.' in line or ':' in line:
+            continue
+        print(line)
         components = line.strip().replace('(', ' ').replace(')', ' ').replace(',', ' ').split()
-        genOpcode(data, components)
+        opcode = genOpcode(data, components)
+        print(opcode, file=out)
 
 if __name__ == '__main__':
     main()
