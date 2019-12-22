@@ -106,7 +106,8 @@ public:
         {0b001, &Riscv::sh},
         {0b010, &Riscv::sw},
         {0b111, &Riscv::stg},
-        {0b110, &Riscv::sptg}};
+        {0b110, &Riscv::sptg},
+        {0b100, &Riscv::cmptg}};
 
     instrMap Jal = {
         {0b0, &Riscv::jal}};
